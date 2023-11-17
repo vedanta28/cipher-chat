@@ -1,0 +1,17 @@
+[32m	[server]: You are now connected to hunt[0m
+[32m	[server]: You are now connected to rag[0m
+handshake
+handshake
+keys
+11693432
+keys
+16895591
+	[rag] $5~
+	[hunt] $5r‚§M
+	[hunt] $47¦)ÓÊG
+	[hunt] $goodbye
+[32m
+	[server]: hunt closed the chat session[0m
+[36m	[server]: Session closed[0m
+goodbye
+goodbye
