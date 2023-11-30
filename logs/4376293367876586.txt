@@ -1,0 +1,17 @@
+[32m	[server]: You are now connected to vedu[0m
+[32m	[server]: You are now connected to as[0m
+handshake
+handshake
+keys
+keys
+161026386
+527917634
+	[as] $¨h
+	[vedu] $¨d¸ƒÉ
+	[as] $¨h§…ÂÀ©
+	[vedu] $¨`¤Ÿß
+[32m
+	[server]: vedu closed the chat session[0m
+[36m	[server]: Session closed[0m
+goodbye
+goodbye

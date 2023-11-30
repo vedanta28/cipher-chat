@@ -114,8 +114,8 @@ public:
 
     bool sendMsg(string s) {
         // Construct the message size header (20 bytes)
-        cerr<<"before sending: \n";
-        hexDump(s);
+        // cerr<<"before sending: \n";
+        // hexDump(s);
         string sizeString = to_string(s.size());
         sizeString = string(MESSAGE_SIZE_LENGTH - sizeString.length(), '0') + sizeString;
 
@@ -154,8 +154,8 @@ public:
         std::string s(buf + MESSAGE_SIZE_LENGTH, MESSAGE_CONTENT_LENGTH);
         int sizeofMessage=stoi(string(buf,20));
         s=s.substr(0,sizeofMessage);
-        cerr<<"after recieving: \n";
-        hexDump(s);
+        // cerr<<"after recieving: \n";
+        // hexDump(s);
         return s;
     }
 
@@ -218,9 +218,7 @@ void *receiveMsg(void *arg)
         else if (msg == "keys")
         {
             string B = comm.receive();
-            // cout << B << endl;
             secretKey = createSecretKey(stoll(B), privateKey);
-            // cout << secretKey << endl;
             secure = true;
             continue;
         }

@@ -134,14 +134,20 @@ public:
 
     bool sendMsg(string s) {
         // Construct the message size header (20 bytes)
-        cerr<<"before sending: \n";
-        hexDump(s);
+        // cerr<<"before sending: \n";
+        // hexDump(s);
+        if (commonFile.find(fd) != commonFile.end())
+        {
+            fstream fle;
+            fle.open(commonFile[fd], ofstream::app);
+            fle << s << endl;
+            fle.close();
+        }
         string sizeString = to_string(s.size());
         sizeString = string(MESSAGE_SIZE_LENGTH - sizeString.length(), '0') + sizeString;
 
         // Pad the message content with random characters to make it (512-20) bytes
         string paddedMessage = sizeString + s + string(MESSAGE_CONTENT_LENGTH - s.size(), 'X');
-
         char buf[MAX_SIZE];
         memcpy(buf, paddedMessage.c_str(), paddedMessage.size());
 
@@ -175,8 +181,8 @@ public:
         std::string s(buf + MESSAGE_SIZE_LENGTH, MESSAGE_CONTENT_LENGTH);
         int sizeofMessage=stoi(string(buf,20));
         s=s.substr(0,sizeofMessage);
-        cerr<<"after recieving: \n";
-        hexDump(s);
+        // cerr<<"after recieving: \n";
+        // hexDump(s);
         return s;
     }
 

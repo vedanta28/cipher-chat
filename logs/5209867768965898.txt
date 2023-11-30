@@ -1,17 +1,0 @@
-[32m	[server]: You are now connected to hunt[0m
-[32m	[server]: You are now connected to rag[0m
-handshake
-handshake
-keys
-7815268
-keys
-2264869
-	[rag] $ê³-
-	[rag] $ô\²89%Ô‹}l
-	[hunt] $ó
-	[hunt] $goodbye
-[32m
-	[server]: hunt closed the chat session[0m
-[36m	[server]: Session closed[0m
-goodbye
-goodbye

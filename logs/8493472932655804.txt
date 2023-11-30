@@ -1,8 +1,0 @@
-[32m	[server]: You are now connected to arab[0m
-[32m	[server]: You are now connected to arnav[0m
-handshake
-handshake
-keys
-142353112
-	[arnav] $hi
-	[arnav] $hello

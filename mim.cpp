@@ -214,7 +214,7 @@ int main()
 
     // bruteForceOnG(authors, msgs, p); // O(p)
     betterBruteForceUsingDiscreteLog(authors, msgs, ga, gb, g, p); // O(sqrt(p))
-    bruteForceUsingSmallSecretKey(authors, msgs, ga, gb, g, p);    // O(a)
+    // bruteForceUsingSmallSecretKey(authors, msgs, ga, gb, g, p);    // O(a)
 
     return 0;
 }
