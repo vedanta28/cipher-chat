@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include<fcntl.h>
 #include "const.hpp"
+#include <unistd.h>
+#include <fcntl.h>
 
 using namespace std;
 

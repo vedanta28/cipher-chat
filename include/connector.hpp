@@ -10,6 +10,8 @@
 #include <netinet/in.h>
 #include <signal.h>
 #include "util.hpp"
+#include <unistd.h>
+#include <fcntl.h>
 using namespace std;
 
 

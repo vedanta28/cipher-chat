@@ -7,18 +7,21 @@
 #include "include/comms.hpp"
 #include "include/connector.hpp"
 #include "include/dh.hpp"
+#include <unistd.h>
+#include <filesystem>
 
 using namespace std;
 
+namespace fs = std::filesystem;
 
-string downloadDirectory="/home/arnav/Downloads/";
+string downloadDirectory;
 
 int sockfd;
 long long privateKey;
 long long secretKey;
 string username;
 bool secure;
-pair<string,string> removeUsername(string msg)
+pair<string, string> removeUsername(string msg)
 {
     string name;
     int i = 0;
@@ -32,11 +35,11 @@ pair<string,string> removeUsername(string msg)
     {
         string ex = msg;
         rc4_crypt(ex, to_string(secretKey));
-        return {ex,"Server"};
+        return {ex, "Server"};
     }
     string newMsg = msg.substr(i);
     // cout << name << ": ";
-    return {newMsg,name};
+    return {newMsg, name};
 }
 
 void *receiveMsg(void *arg)
@@ -46,19 +49,20 @@ void *receiveMsg(void *arg)
     {
         comms comm(sockfd);
         string msg = comm.receive();
-        string name="Server";
+        string name = "Server";
         if (secure)
         {
-            if (msg == "!file"){
-                msg=comm.receive();
-                long long sz=stoll(comm.receive());
-                auto file = parseTheString(msg,'/');
-                comm.recvfile(downloadDirectory+"over_net_"+file.back(),sz,secretKey);
+            if (msg == "!file")
+            {
+                msg = comm.receive();
+                long long sz = stoll(comm.receive());
+                auto file = parseTheString(msg, '/');
+                comm.recvfile(downloadDirectory + "over_net_" + file.back(), sz, secretKey);
                 continue;
-            } 
+            }
             auto res = removeUsername(msg);
-            msg=res.first;
-            name=res.second;
+            msg = res.first;
+            name = res.second;
             rc4_crypt(msg, to_string(secretKey));
         }
         if (msg == "!close")
@@ -87,8 +91,9 @@ void *receiveMsg(void *arg)
             secure = true;
             continue;
         }
-        
-        cout<<string(65,' ')<<CYN<<name<<" : "<<GRN<<msg<<NRM<<endl<<endl;
+
+        cout << string(65, ' ') << CYN << name << " : " << GRN << msg << NRM << endl
+             << endl;
     }
 }
 void *sendMsg(void *arg)
@@ -98,21 +103,25 @@ void *sendMsg(void *arg)
     {
         string msg;
         getline(cin, msg);
-        string prompt=username+"(You): ";
-        if (msg.size()) cout << GOUP << left << CYN << prompt << MAG << msg << NRM << endl<<endl;
-        if (msg == "!clear"){
+        string prompt = username + "(You): ";
+        if (msg.size())
+            cout << GOUP << left << CYN << prompt << MAG << msg << NRM << endl
+                 << endl;
+        if (msg == "!clear")
+        {
             cout << CLR;
             continue;
         }
         comms comm(sockfd);
         if (secure)
         {
-            auto parsed_message=parseTheString(msg,' ');
-            if (parsed_message[0] == "!file"){
+            auto parsed_message = parseTheString(msg, ' ');
+            if (parsed_message[0] == "!file")
+            {
                 comm.sendMsg("!file");
                 comm.sendMsg(parsed_message[1]);
                 comm.sendMsg(to_string(get_file_size(parsed_message[1])));
-                comm.sendfile(parsed_message[1],secretKey);
+                comm.sendfile(parsed_message[1], secretKey);
                 continue;
             }
             if (msg != "!goodbye" && msg != "!close")
@@ -125,7 +134,8 @@ void *sendMsg(void *arg)
     }
 }
 
-void exit_handler(int sig){
+void exit_handler(int sig)
+{
     comms comm(sockfd);
     comm.sendMsg("!close");
     sleep(0.5);
@@ -133,15 +143,18 @@ void exit_handler(int sig){
     exit(1);
 }
 
-void getPublicKeys(string s){
+void getPublicKeys(string s)
+{
     string strG, strP;
     int i = 0;
-    while (i < s.length() && s[i] != ' '){
+    while (i < s.length() && s[i] != ' ')
+    {
         strG.push_back(s[i]);
-        i++; 
+        i++;
     }
     i++;
-    while (i < s.length() && s[i] != ' '){
+    while (i < s.length() && s[i] != ' ')
+    {
         strP.push_back(s[i]);
         i++;
     }
@@ -150,11 +163,30 @@ void getPublicKeys(string s){
 
 int main(int argc, char **argv)
 {
-    srand(time(NULL)); 
-    pthread_t receiverThread,senderThread;
+    string currentPath = fs::current_path();
+    string subdirectory = "Files";
+
+    downloadDirectory = currentPath + "/" + subdirectory + "/";
+
+    if (!fs::exists(downloadDirectory))
+    {
+        // Create the directory if it doesn't exist
+        if (fs::create_directory(downloadDirectory))
+        {
+            cout << "Directory created: " << downloadDirectory << std::endl;
+        }
+        else
+        {
+            cerr << "Failed to create directory: " << downloadDirectory << std::endl;
+            exit(1);
+        }
+    }
+
+    srand(time(NULL));
+    pthread_t receiverThread, senderThread;
     string ip_address;
-    cout<<"Where do you want to connect to?\n";
-    cin>>ip_address;
+    cout << "Where do you want to connect to?\n";
+    cin >> ip_address;
     connector client(0, PORT, ip_address);
     signal(SIGINT, exit_handler);
     sockfd = client.connectToServer();

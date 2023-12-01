@@ -6,6 +6,7 @@
 #include "include/comms.hpp"
 #include "include/connector.hpp"
 #include "include/mim.hpp"
+#include <unistd.h>
 
 using namespace std;
 
@@ -38,7 +39,6 @@ void *handle_client(void *arg);
 bool connectToClient(string username, vector<string> &parsedMsg, string &logFile);
 void closeSession(string username);
 
-
 string sendPublicKeys()
 {
     return to_string(G) + " " + to_string(P) + " ";
@@ -66,8 +66,8 @@ void *handle_client(void *arg)
     }
     usernames[username] = client_socket;
 
-    //dbg
-    // cout<<"now i will send accpet messg to client"<<endl;
+    // dbg
+    //  cout<<"now i will send accpet messg to client"<<endl;
     comm.sendMsg("Username accepted.\n");
     cout << GRN << username << " connected." << NRM << endl;
     // comm.sendMsg(readme(username));
@@ -91,8 +91,8 @@ void *handle_client(void *arg)
         {
             string A = parsedMsg[1];
             cout << A << endl;
-            ofstream of(commonFile[client_socket],ios::app);
-            of<<A<<endl;
+            ofstream of(commonFile[client_socket], ios::app);
+            of << A << endl;
             of.close();
             comms comm1(usernames[partner[username]]);
             comm1.sendMsg("!keys");
@@ -106,18 +106,19 @@ void *handle_client(void *arg)
         else if (partner.find(username) != partner.end())
         {
             comms reciever(usernames[partner[username]]);
-            if( parsedMsg[0] == "!file"){
+            if (parsedMsg[0] == "!file")
+            {
                 string fileName = comm.receive();
                 ll sz = stoll(comm.receive());
-                cout<<YEL<<"Transferring a File of size "<<formatBytes(sz)<<" ("<<sz<<" Bytes ) "<<NRM<<endl;
+                cout << YEL << "Transferring a File of size " << formatBytes(sz) << " (" << sz << " Bytes ) " << NRM << endl;
                 reciever.sendMsg("!file");
                 reciever.sendMsg(fileName);
-                auto file = parseTheString(fileName,'/');
+                auto file = parseTheString(fileName, '/');
                 reciever.sendMsg(to_string(sz));
-                ofstream of(commonFile[client_socket],ios::app);
-                of<<"!file "<<serverDir+"files/"+file.back()<<endl;
+                ofstream of(commonFile[client_socket], ios::app);
+                of << "!file " << serverDir + "files/" + file.back() << endl;
                 of.close();
-                transfile(client_socket,usernames[partner[username]],sz,serverDir+"files/"+file.back());
+                transfile(client_socket, usernames[partner[username]], sz, serverDir + "files/" + file.back());
                 continue;
             }
 
@@ -130,15 +131,16 @@ void *handle_client(void *arg)
             string s;
             s += username + " $" + msg;
             cout << s << endl;
-            ofstream of(commonFile[client_socket],ios::app);
-            of<<username + " $ ";
-            for(int i=0;i<msg.size();i++){
-                if(i!=msg.size()-1)
-                    of<<charToHexString(msg[i])<<" ";
-                else 
-                    of<<charToHexString(msg[i]);
+            ofstream of(commonFile[client_socket], ios::app);
+            of << username + " $ ";
+            for (int i = 0; i < msg.size(); i++)
+            {
+                if (i != msg.size() - 1)
+                    of << charToHexString(msg[i]) << " ";
+                else
+                    of << charToHexString(msg[i]);
             }
-            of<<endl;
+            of << endl;
             of.close();
             reciever.sendMsg(s);
         }
@@ -169,8 +171,8 @@ void sendStatus(string username)
     for (int i = 0; i < names.size(); i++)
     {
         string status = partner.find(names[i]) == partner.end() ? string(GRN) + "FREE" + string(NRM) : string(RED) + "BUSY" + string(NRM);
-        statusMsg += string(78,' ') + string(BLU) + names[i] + string(NRM) + " " + status;
-        if(i!=names.size()-1)
+        statusMsg += string(78, ' ') + string(BLU) + names[i] + string(NRM) + " " + status;
+        if (i != names.size() - 1)
             statusMsg += "\n";
     }
     comms comm(usernames[username]);
@@ -225,7 +227,7 @@ bool connectToClient(string username, vector<string> &parsedMsg, string &logFile
     partner[partnerName] = username;
 
     commonFile[usernames[username]] = commonFile[usernames[partnerName]] = logFile;
-    ofstream of(logFile,ios::app);
+    ofstream of(logFile, ios::app);
     of << to_string(G) << endl;
     of << to_string(P) << endl;
     of.close();
@@ -266,7 +268,7 @@ void closeSession(string username)
     msg += username + " closed the chat session" + NRM;
     comms comm1(usernames[partnerName]);
     comm1.sendMsg(msg);
-    cout << msg<<endl;
+    cout << msg << endl;
     if (partner.find(partnerName) != partner.end())
         partner.erase(partnerName);
     if (partner.find(username) != partner.end())
@@ -282,8 +284,9 @@ void closeSession(string username)
     comm.sendMsg(message);
     comm1.sendMsg(message);
     cout << "Sent goodbyes to both\n";
-    if(intrusiveness){
-        cout<<"Server Operating in intrusive mode"<<endl;
+    if (intrusiveness)
+    {
+        cout << "Server Operating in intrusive mode" << endl;
         fix(commonFile[usernames[username]]);
     }
     if (commonFile.find(usernames[username]) != commonFile.end())
@@ -311,11 +314,12 @@ int main(int argc, char **argv)
 {
     srand(time(NULL));
     generatePublicKeys();
-    if (argc < 2 or argc >2 ){
+    if (argc < 2 or argc > 2)
+    {
         printf("Too many(few) arguments. Expected ./server <intrusiveness>\n");
         exit(1);
     }
-    intrusiveness=stoi(argv[1]);
+    intrusiveness = stoi(argv[1]);
     connector server(1, PORT);
     server.listenForClients();
 
@@ -325,16 +329,17 @@ int main(int argc, char **argv)
     cout << GRN << "Server is up and running" << NRM << endl;
     cout << GRN << "G: " << to_string(G) << endl;
     cout << GRN << "P: " << to_string(P) << endl;
-    serverDir="./logs/";
+    serverDir = "./logs/";
     auto now = chrono::system_clock::now();
     auto timePoint = chrono::system_clock::to_time_t(now);
     char buffer[80];
     strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localtime(&timePoint));
     string currentTime(buffer);
-    serverDir+=currentTime+"/";
+    serverDir += currentTime + "/";
     filesystem::create_directory(serverDir);
-    filesystem::create_directory(serverDir+"files/");
-    while (true){
+    filesystem::create_directory(serverDir + "files/");
+    while (true)
+    {
         int client_socket = server.acceptNow();
         waiting_client_sockets.push(client_socket);
         pthread_t thread_id;

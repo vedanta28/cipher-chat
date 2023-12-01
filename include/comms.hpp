@@ -11,6 +11,8 @@
 #include "rc4.hpp"
 #include "util.hpp"
 #include "const.hpp"
+#include <unistd.h>
+#include <fcntl.h>
 
 
 using namespace std;
